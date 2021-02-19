@@ -5,7 +5,7 @@ import Axios from "axios";
 
 //import icons from react icons
 import { AiFillExclamationCircle, AiOutlineExclamationCircle } from 'react-icons/ai';
-import { RiImageAddFill } from 'react-icons/ri';
+import { RiImageAddFill, RiDeleteBack2Fill } from 'react-icons/ri';
 
 export default function Todos() {
   const [todos, setTodos] = useState([]);
@@ -24,8 +24,10 @@ export default function Todos() {
       tick();      
     }, 1000);
     try {
-      const {data} = await Axios.get(`http://localhost:8080/todos?email=${credentials.email}&pass=${credentials.password}`);
-      setTodos(data.todos)
+      const {data} = await Axios.get(`http://localhost:8080/todos?email=${credentials.email}`,{
+          headers: {user_token: `${credentials.token}`}
+        });
+      setTodos(data.todos);
     }catch (error) {
       setError(error.message);
     }
@@ -36,7 +38,6 @@ export default function Todos() {
   }
 
   const alarm = async() => {
-    // console.log(clock)
     let test=''
     todos.forEach(
       (alarm) => {if(`${new Date(alarm.timer)}` === `${clock}`){
@@ -44,15 +45,13 @@ export default function Todos() {
           alert(`${alarm.text}`);
         }
       }}
-
-      // alarm => test=`${new Date(alarm.timer)}`
     ) 
   }
 
   const send = async(newTodos) => {
     try {
-      const { data } = await Axios.post(`http://localhost:8080/todos?email=${credentials.email}&pass=${credentials.password}`, {
-        newTodos
+      const { data } = await Axios.post(`http://localhost:8080/todos?email=${credentials.email}`,{newTodos },{
+        headers: {user_token: `${credentials.token}`}
       });
     }catch (error) {
       setError(error.message);
@@ -63,7 +62,9 @@ export default function Todos() {
   const sendImg = async() => {
     try {
       if(imgContainer!==''){
-        const { data } = await Axios.post(`http://localhost:8080/image`,imgContainer);
+        const { data } = await Axios.post(`http://localhost:8080/image`,imgContainer,{
+          headers: {user_token: `${credentials.token}`}
+        });
       return data;
       }
       return '';
@@ -104,7 +105,6 @@ export default function Todos() {
 
   const handleImage = async (e) => {
     const {files} = e.target;
-    console.log(files)
     const file=files[0];
     let formData = new FormData();
     formData.append("file", file);
@@ -130,19 +130,23 @@ export default function Todos() {
   };
 
   const urgentTodo = (index) => {
-    const newTodo = [...todos];
-    newTodo[index].urgent=!newTodo[index].urgent;
-    newTodo[index].priority=false;
-    setTodos(newTodo);
-    send(newTodo);
+    const newTodos = todos;
+    newTodos[index].urgent=!newTodo[index].urgent;
+    newTodos[index].priority=false;
+    setTodos(newTodos);
+    send(newTodos);
   };
 
   const prioryTodo = (index) => {
-    const newTodo = [...todos];
-    newTodo[index].priority=!newTodo[index].priority;
-    newTodo[index].urgent=false;
-    setTodos(newTodo);
-    send(newTodo);
+    const newTodos = todos;
+    newTodos[index].priority=!newTodo[index].priority;
+    newTodos[index].urgent=false;
+    setTodos(newTodos);
+    send(newTodos);
+  };
+
+  const deleteTodo = async(index) => {
+    const newTodos = todos;~
   };
 
   alarm();
@@ -177,6 +181,7 @@ export default function Todos() {
           <div key={index} className={`${category} m-4`}>
             <input type="checkbox" onChange={() => toggleTodo(index)}/>
             <input className={`item ${todo.completed ? 'done' : ''}`} type="text" value={todo.text} name="text" onChange={(e) => handleChangeItem(index,e.target.value)}/>
+            <img src={todo.urlImg} className='img-style'/>
             <label> 
               <button type="button" className='select' name="urgent" onClick={() => urgentTodo(index)}/>
               <AiFillExclamationCircle className='icon-select urgent'/>
@@ -185,7 +190,10 @@ export default function Todos() {
               <button type="button"className='select' name="priority" onClick={() => prioryTodo(index)}/>
               <AiOutlineExclamationCircle className='icon-select priory'/>
             </label>
-            <img src={todo.urlImg} className='img-style'/>
+            <label> 
+              <button type="button"className='select' name="priority" onClick={() => deleteTodo(index)}/>
+              <RiDeleteBack2Fill className='icon-select'/>
+            </label>
           </div>
         )}
       )}

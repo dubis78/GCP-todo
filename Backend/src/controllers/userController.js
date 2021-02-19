@@ -1,8 +1,10 @@
-const {users} = require('../models/Users');
-const {ObjectId} = require("mongoose").Types;
-const helpers = require('../helpers/emailSender');
 const jwt = require('jsonwebtoken');
 const sha1 = require('sha1');
+const {users} = require('../models/Users');
+const {ObjectId} = require("mongoose").Types;
+
+const helpers = require('../helpers/emailSender');
+// const {tokenValidator} = require('../helpers/tokenValidator');
 
 
 exports.getUsers = async(req,res)=>{    
@@ -27,8 +29,7 @@ exports.getUser = async(req,res)=>{
  };
 
  exports.postUser = async(req,res)=>{    
-    try{   
-        console.log(req.body) 
+    try{
         const { name, lastName, email, password} = req.body;
         const secretPass=sha1(password);
 
@@ -37,15 +38,11 @@ exports.getUser = async(req,res)=>{
             res.status(500).json({message: "user already exists"});
             return;
         }
-        // const user={email,password}
-        const token = jwt.sign({user},'geek');
-        // res.json(token);
-
+        const token = jwt.sign({email,secretPass},process.env.SECRET_KEY);
         const newUser = new users({name, lastName, email, secretPass});
         newUser.save();
         helpers.sendMail(name + " " + lastName, email, password);
-        return res.status(201).json({email, password});  
-        // return res.status(201).json({email, secretPass,token});    
+        return res.status(201).json({email, token});  
 
     } catch(e){
         console.log(e);
@@ -56,15 +53,14 @@ exports.getUser = async(req,res)=>{
  exports.loginUser = async(req,res)=>{    
     try{    
         const { email, password} = req.body;
-        // const user={email,password}
-        // const token = jwt.sign({user},'geek');
+        const secretPass=sha1(password);
+        const token = jwt.sign({email,secretPass},process.env.SECRET_KEY);
         const user = await users.findOne({email}).exec();
-        if (!user || user.password !== password) {
+        if (!user || user.secretPass !== secretPass) {
             res.status(403).json({message: "invalid login"});
             return;    
         }
-        res.json({email, password});
-        // res.json({email, password,token});        
+        res.json({email,token});        
     }catch(e){
         console.log(e);
         return res.status(500).json('Internal server error');

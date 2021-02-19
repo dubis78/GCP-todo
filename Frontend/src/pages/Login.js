@@ -20,10 +20,7 @@ const Login=()=> {
   const login = async(e) => {
     e.preventDefault();
     try {
-      const { data } = await Axios.post(`http://localhost:8080/login`, {
-        email,
-        password
-      });
+      const { data } = await Axios.post(`http://localhost:8080/login`,{email,password});
       if(data.email){        
         setCredentials(data);
         history.push("/");

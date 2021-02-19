@@ -23,7 +23,7 @@ const Register=()=>{
     try {
       const { data } = await Axios.post(`http://localhost:8080/register`,user);
       if(data.email){        
-        setCredentials({data});
+        setCredentials(data);
         history.push("/");
       }
       else{}
