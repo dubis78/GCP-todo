@@ -1,0 +1,77 @@
+:root {
+  --Cgreen: #79c142;
+  --Cgrey: #5c5c5e;
+  --CWgreen:#a8d189;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+html,body, #root {
+  top: 0;
+  left: 0;
+  font-family: sans-serif;
+  text-align: center;
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.select { 
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.icon-select {
+  cursor: pointer;  
+  fill: #383737;
+  font-size: 24px;
+}
+
+.select + .urgent {
+  fill: #df3232;
+}
+
+.select + .priory {
+  fill: #eed706;
+}
+
+.select + .date-icon {
+  fill: #289911;
+}
+
+.normalStatus{
+  border: 2px solid #596068;
+  outline:none
+}
+
+.urgentStatus{
+  border: 2px solid #da2404;
+  outline:none
+}
+
+.prioryStatus{
+  border: 2px solid #dac611;
+  outline:none
+}
+
+.item{  
+  border: none;
+  border-color: transparent;
+  cursor: pointer;  
+  outline:none
+}
+
+.done{
+  text-decoration: line-through;
+}
+
+.img-style {
+  border-radius: 100%;
+  width:150px;
+}
